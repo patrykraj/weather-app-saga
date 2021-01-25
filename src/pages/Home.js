@@ -50,7 +50,7 @@ function Home({
     <div className="App">
       <Container night={data && data.weather[0].icon.includes('n')} onClick={onResetSearchList}>
         <NavBar city={data && data.name} />
-        {error && !data ? <Error err={error.msg} /> : null}
+        {error ? <Error err={error.msg} /> : null}
         <Form searchedQuery={searchedQuery} setSearchedQuery={setSearchedQuery} />
         <WeatherIcon src={data ? `http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png` : 'http://openweathermap.org/img/wn/02d@4x.png'} alt="weather-icon" />
         {content}

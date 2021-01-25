@@ -1,13 +1,17 @@
 import {
   call, put, takeEvery,
 } from 'redux-saga/effects';
-import axios from 'axios';
 import * as actions from '../constants';
 
 function fetchForecast({ name, key }) {
-  return axios
-    .get(`https://api.weatherbit.io/v2.0/forecast/daily?city=${name}&key=${key}`)
-    .then((res) => res.data)
+  return fetch(`https://api.weatherbit.io/v2.0/forecast/daily?city=${name}&key=${key}`)
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      return null;
+    })
+    .then((res) => res)
     .catch((err) => (err.response ? err.response.data.message : err.message));
 }
 

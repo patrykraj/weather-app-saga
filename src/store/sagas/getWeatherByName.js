@@ -1,23 +1,29 @@
 import {
   call, put, takeEvery,
 } from 'redux-saga/effects';
-import axios from 'axios';
 import * as actions from '../constants';
 
 function fetchWeatherByName({ forecast, url }) {
-  return axios
-    .get(url)
+  return fetch(url)
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      return null;
+    })
     .then((city) => {
-      if (city.statusText !== 'No Content') {
+      if (!city) {
+        return null;
+      } else {
         if (forecast) {
-          const newurl = `${window.location.protocol}//${window.location.host}/forecast/${city.data.city_name}`;
+          const newurl = `${window.location.protocol}//${window.location.host}/forecast/${city.city_name}`;
           window.history.pushState({ path: newurl }, '', newurl);
         }
 
-        return city.data;
-      } return null;
+        return city;
+      }
     })
-    .catch((err) => (err.response ? err.response.data.message : err.message));
+    .catch(() => null);
 }
 
 function* watchFetchWeatherByName(action) {
@@ -25,15 +31,13 @@ function* watchFetchWeatherByName(action) {
 
   try {
     const payload = yield call(fetchWeatherByName, action.payload);
-    if (action.payload.forecast) {
+    if (!payload) {
+      return yield put({ type: actions.GET_WEATHER_FAILURE, payload: 'City not found' });
+    } else if (action.payload.forecast) {
       return yield put({ type: actions.GET_FORECAST_SUCCESS, payload });
+    } else {
+      return yield put({ type: actions.GET_WEATHER_SUCCESS, payload });
     }
-
-    if (!action.payload) {
-      return yield put({ type: actions.GET_WEATHER_FAILURE, payload: `Cannot find ${action.payload.name}` });
-    }
-
-    return yield put({ type: actions.GET_WEATHER_SUCCESS, payload });
   } catch (e) {
     return yield put({ type: actions.GET_WEATHER_FAILURE, payload: e.message });
   }

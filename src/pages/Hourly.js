@@ -31,7 +31,7 @@ function Hourly(props) {
     content = (
                 <>
                     <p>Hourly forecast for</p>
-                    <h2>{data.city_name}, {data.country_code}</h2>
+                    <h2>{data.cityName}, {data.countryCode}</h2>
                     <Hours data={data} />
                 </>
     );
