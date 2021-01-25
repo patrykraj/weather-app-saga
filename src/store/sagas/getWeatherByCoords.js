@@ -6,16 +6,15 @@ import * as actions from '../constants';
 function fetchWeatherByCoords({ coords, key }) {
   return fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${key}&units=metric`)
     .then((response) => {
-      if (response.status === 200) {
+      if (response.ok && response.status === 200) {
         return response.json();
       }
-      return null;
+      throw Error(response.status);
     })
     .then((res) => ({
       data: res,
       coords,
-    }))
-    .catch(() => null);
+    }));
 }
 
 function* getWeatherByCoords(action) {

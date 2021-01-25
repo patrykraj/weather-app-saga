@@ -6,13 +6,11 @@ import * as actions from '../constants';
 function fetchForecast({ name, key }) {
   return fetch(`https://api.weatherbit.io/v2.0/forecast/daily?city=${name}&key=${key}`)
     .then((response) => {
-      if (response.status === 200) {
+      if (response.ok && response.status === 200) {
         return response.json();
       }
-      return null;
-    })
-    .then((res) => res)
-    .catch((err) => (err.response ? err.response.data.message : err.message));
+      throw Error(response.status);
+    });
 }
 
 function* watchFetchForecast(action) {
@@ -22,7 +20,7 @@ function* watchFetchForecast(action) {
     const payload = yield call(fetchForecast, action.payload);
     yield put({ type: actions.GET_FORECAST_SUCCESS, payload });
   } catch (e) {
-    yield put({ type: actions.GET_FORECAST_FAILURE });
+    yield put({ type: actions.GET_FORECAST_FAILURE, payload: e.message });
   }
 }
 

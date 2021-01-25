@@ -7,10 +7,10 @@ function fetchSearchList(query) {
   if (query.trim().length > 2) {
     return fetch(`https://public.opendatasoft.com/api/records/1.0/search/?dataset=worldcitiespop&q=${query}&rows=5&sort=population`)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.ok && response.status === 200) {
           return response.json();
         }
-        return null;
+        throw Error(response.status);
       })
       .then((res) => {
         const list = [];
@@ -20,8 +20,7 @@ function fetchSearchList(query) {
         }
 
         return list;
-      })
-      .catch(() => null);
+      });
   } else {
     return null;
   }
@@ -32,12 +31,7 @@ function* watchFetchSearchList(action) {
 
   try {
     const payload = yield call(fetchSearchList, action.payload);
-
-    if (payload.length) {
-      yield put({ type: actions.GET_SEARCH_LIST_SUCCESS, payload });
-    } else {
-      yield put({ type: actions.GET_SEARCH_LIST_FAILURE });
-    }
+    yield put({ type: actions.GET_SEARCH_LIST_SUCCESS, payload });
   } catch (e) {
     yield put({ type: actions.GET_SEARCH_LIST_FAILURE });
   }
