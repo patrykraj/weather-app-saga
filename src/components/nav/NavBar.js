@@ -11,11 +11,11 @@ function NavBar({ city }) {
     },
     {
       name: 'hourly',
-      to: city ? `/hourly/${city}` : '/',
+      to: city ? `/hourly/${city}` : '/hourly',
     },
     {
       name: 'forecast',
-      to: city ? `/forecast/${city}` : '/',
+      to: city ? `/forecast/${city}` : '/forecast',
     },
   ];
 

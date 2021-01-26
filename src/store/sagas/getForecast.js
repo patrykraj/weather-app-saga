@@ -1,14 +1,16 @@
 import {
   call, put, takeEvery,
 } from 'redux-saga/effects';
-import axios from 'axios';
 import * as actions from '../constants';
 
 function fetchForecast({ name, key }) {
-  return axios
-    .get(`https://api.weatherbit.io/v2.0/forecast/daily?city=${name}&key=${key}`)
-    .then((res) => res.data)
-    .catch((err) => (err.response ? err.response.data.message : err.message));
+  return fetch(`https://api.weatherbit.io/v2.0/forecast/daily?city=${name}&key=${key}`)
+    .then((response) => {
+      if (response.ok && response.status === 200) {
+        return response.json();
+      }
+      throw Error(response.status);
+    });
 }
 
 function* watchFetchForecast(action) {
@@ -18,7 +20,7 @@ function* watchFetchForecast(action) {
     const payload = yield call(fetchForecast, action.payload);
     yield put({ type: actions.GET_FORECAST_SUCCESS, payload });
   } catch (e) {
-    yield put({ type: actions.GET_FORECAST_FAILURE });
+    yield put({ type: actions.GET_FORECAST_FAILURE, payload: e.message });
   }
 }
 
